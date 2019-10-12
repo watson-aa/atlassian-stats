@@ -1,0 +1,22 @@
+version: '3'
+
+networks:
+  atstats:
+
+services:
+    mysql:
+        image: mysql:5.7.22
+        container_name: mysql
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: atstats
+            MYSQL_USER: atstats
+            MYSQL_PASSWORD: notverysecure
+            MYSQL_ROOT_PASSWORD: notverysecure
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        networks:
+            - atstats
