@@ -121,9 +121,9 @@ class Connection:
                 comments    text,
                 author      %s,
                 project     %s,
-                constraint activity_fk
+                constraint pr_activity_fk
                 foreign key (author) references account (slug),
-                constraint activity_pk
+                constraint pr_activity_pk
                 primary key (id, project)
                 )''' % params
         elif table == 'pr_reviewer':
@@ -137,9 +137,9 @@ class Connection:
                 reviewer        %s,
                 created_date    %s,
                 action          text,
-                constraint reviewer_fk
+                constraint pr_reviewer_fk
                 foreign key (reviewer) references account (slug),
-                constraint reviewer_pk
+                constraint pr_reviewer_pk
                 primary key (activity_id, reviewer, created_date)
                 )''' % params
         elif table == 'pr_comment':
@@ -149,9 +149,9 @@ class Connection:
                 comment         text,
                 action          text,
                 created_date    datetime,
-                constraint comment_fk
+                constraint pr_comment_fk
                 foreign key (commenter) references account (slug),
-                constraint comment_pk
+                constraint pr_comment_pk
                 primary key (activity_id, commenter)
                 )'''
 
