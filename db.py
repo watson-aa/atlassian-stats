@@ -32,7 +32,7 @@ class Connection:
         return table_exists
 
     def __createTables(self):
-        for table in ('account', 'activity', 'reviewer', 'comment'):
+        for table in ('account', 'pr_activity', 'pr_reviewer', 'pr_comment'):
             if self.__checkTableExists(table) == False:
                 self.__createTable(table)
 
@@ -101,13 +101,13 @@ class Connection:
                 display text,
                 type    text
                 )''' % params
-        elif table == 'activity':
+        elif table == 'pr_activity':
             if self.__db == 'sqlite':
                 params = ('integer',) * 3 + ('text',) * 2
             elif self.__db == 'mysql':
                 params = ('datetime',) * 3 + ('varchar(15)', 'varchar(128)')
 
-            sql = '''create table activity (
+            sql = '''create table pr_activity (
                 id          integer,
                 title       text,
                 description text,
@@ -126,13 +126,13 @@ class Connection:
                 constraint activity_pk
                 primary key (id, project)
                 )''' % params
-        elif table == 'reviewer':
+        elif table == 'pr_reviewer':
             if self.__db == 'sqlite':
                 params = ('text', 'integer') 
             elif self.__db == 'mysql':
                 params = ('varchar(15)', 'datetime') 
 
-            sql = '''create table reviewer (
+            sql = '''create table pr_reviewer (
                 activity_id     integer,
                 reviewer        %s,
                 created_date    %s,
@@ -142,8 +142,8 @@ class Connection:
                 constraint reviewer_pk
                 primary key (activity_id, reviewer, created_date)
                 )''' % params
-        elif table == 'comment':
-            sql = '''create table comment (
+        elif table == 'pr_comment':
+            sql = '''create table pr_comment (
                 activity_id     integer,
                 commenter       varchar(15),
                 comment         text,
@@ -199,7 +199,7 @@ class Connection:
         earliest_date = datetime.datetime.now()
         vars = self.__generateDbSpecificVar(13)
 
-        sql = '''replace into activity
+        sql = '''replace into pr_activity
                 (id, title, description, state, open, closed, created_date, closed_date, updated_date, from_branch, comments, author, project)
                 values
                 ({vars})'''.format(vars=vars)
@@ -232,7 +232,7 @@ class Connection:
     def addReviewers(self, reviewers):
         vars = self.__generateDbSpecificVar(4)
 
-        sql = '''replace into reviewer
+        sql = '''replace into pr_reviewer
                 (activity_id, reviewer, created_date, action)
                 values
                 ({vars})'''.format(vars=vars)
@@ -251,7 +251,7 @@ class Connection:
     def addComments(self, comments):
         vars = self.__generateDbSpecificVar(5)
 
-        sql = '''replace into comment
+        sql = '''replace into pr_comment
                 (activity_id, commenter, comment, action, created_date)
                 values
                 ({vars})'''.format(vars=vars)
