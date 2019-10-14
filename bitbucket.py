@@ -1,5 +1,6 @@
 import configparser
 import requests
+import common
 import db
 import datetime
 
@@ -14,21 +15,11 @@ class Bitbucket:
         pass
 
     def loadConfig(self, config_file):
-        self.__config = configparser.ConfigParser()
-        self.__config.read(config_file)
-        return self.__config
+        self.__config = common.loadConfig(config_file)
 
     def loadData(self, start_date):
         for project in self.__config['projects']:
             self._getDataFromApi(project, self.__config['projects'][project], start_date)
-
-    def _makeApiRequest(self, url, auth, verify):
-        response = requests.get(url, verify=verify, auth=auth)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print(url + ' -- ' + str(response.status_code))
-            return {}
 
     def __extractActData(self, activity_id, data):
         reviewers = []
@@ -61,7 +52,7 @@ class Bitbucket:
             url = 'https://' + self.__config['server']['Domain'] + self.__config['server']['ApiPath'] + project + '?state=ALL&limit=' + str(self._page_size) + '&start=' + str(self._page_size * counter)
             auth = (self.__config['server']['User'], self.__config['server']['Password'])
 
-            data = self._makeApiRequest(url, auth, False)
+            data = common.makeApiRequest(url, auth, False)
             (activities, users) = self.__extractPRData(project_name, data)
 
             conn.addUsers(users)
@@ -69,7 +60,7 @@ class Bitbucket:
 
             for activity in activities:
                 url = 'https://' + self.__config['server']['Domain'] + self.__config['server']['ApiPath'] + project + '/' + str(activity['id']) + '/activities'
-                data = self._makeApiRequest(url, auth, False)
+                data = common.makeApiRequest(url, auth, False)
                 (reviewers, comments, users) = self.__extractActData(activity['id'], data)
                 conn.addUsers(users)
                 conn.addReviewers(reviewers)
