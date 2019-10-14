@@ -13,7 +13,8 @@ class Connection:
         self.__db = config['Type']
         self.__config = config
         self._createConnection()
-        self.__createTables()
+        self.__createCommonTables()
+        self.__createBitbucketTables()
 
     def __checkTableExists(self, table):
         if self.__db == 'sqlite':
@@ -31,10 +32,15 @@ class Connection:
 
         return table_exists
 
-    def __createTables(self):
+    def __createCommonTables(self):
+        for table in ('account'):
+            if self.__checkTableExists(table) == False:
+                self.__createCommonTable(table)
+
+    def __createBitbucketTables(self):
         for table in ('account', 'pr_activity', 'pr_reviewer', 'pr_comment'):
             if self.__checkTableExists(table) == False:
-                self.__createTable(table)
+                self.__createBitbucketTable(table)
 
     def __createMySqlDatabase(self):
         config = {
@@ -68,7 +74,7 @@ class Connection:
         new_file = not os.path.exists(self.__sqlite_filename)
         self.__conn = sqlite3.connect(self.__sqlite_filename)
         if new_file == True:
-            self.__createTables()
+            self.__createBitbucketTables()
 
     def __executeSql(self, sql, param=None):
         if self.__db == 'sqlite':
@@ -86,7 +92,7 @@ class Connection:
         else:
             self.__conn = None
 
-    def __createTable(self, table):
+    def __createCommonTable(self, table):
         sql = ''
         if table == 'account':
             if self.__db == 'sqlite':
@@ -101,7 +107,13 @@ class Connection:
                 display text,
                 type    text
                 )''' % params
-        elif table == 'pr_activity':
+
+        if sql != '':
+            self.__executeSql(sql, None)
+
+    def __createBitbucketTable(self, table):
+        sql = ''
+        if table == 'pr_activity':
             if self.__db == 'sqlite':
                 params = ('integer',) * 3 + ('text',) * 2
             elif self.__db == 'mysql':
