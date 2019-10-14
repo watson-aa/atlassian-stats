@@ -15,6 +15,7 @@ class Connection:
         self._createConnection()
         self.__createCommonTables()
         self.__createBitbucketTables()
+        self.__createJiraTables()
 
     def __checkTableExists(self, table):
         if self.__db == 'sqlite':
@@ -37,8 +38,13 @@ class Connection:
             if self.__checkTableExists(table) == False:
                 self.__createCommonTable(table)
 
+    def __createJiraTables(self):
+        for table in ('j_issue' ,'j_label'):
+            if self.__checkTableExists(table) == False:
+                self.__createJiraTable(table)
+
     def __createBitbucketTables(self):
-        for table in ('account', 'pr_activity', 'pr_reviewer', 'pr_comment'):
+        for table in ('pr_activity', 'pr_reviewer', 'pr_comment'):
             if self.__checkTableExists(table) == False:
                 self.__createBitbucketTable(table)
 
@@ -106,6 +112,52 @@ class Connection:
                 email   text,
                 display text,
                 type    text
+                )''' % params
+
+        if sql != '':
+            self.__executeSql(sql, None)
+
+    def __createJiraTable(self, table):
+        sql = ''
+        if table == 'j_issue':
+            if self.__db == 'sqlite':
+                params = ('text primary key',) + ('text',) *  3 + ('integer',) * 3
+            elif self.__db == 'mysql':
+                params = ('varchar(15) primary key',) + ('varchar(15)',) *  3 + ('datetime',) * 3
+
+            sql = '''create table j_issue (
+                issue_key       %s,
+                priority        integer,
+                status          text,
+                assignee        %s,
+                creator         %s,
+                reporter        %s,
+                type            text,
+                project         text,
+                project_name    text,
+                created_date    %s,
+                updated_date    %s,
+                resolved_date   %s,
+                description     text,
+                summary         text,
+                constraint j_issue_assignee_fk
+                foreign key (assignee) references account (slug),
+                constraint j_issue_creator_fk
+                foreign key (creator) references account (slug),
+                constraint j_issue_reporter_fk
+                foreign key (reporter) references account (slug)
+                )''' % params
+        elif table == 'j_label':
+            if self.__db == 'sqlite':
+                params = ('text primary key',) + ('text',)
+            elif self.__db == 'mysql':
+                params = ('varchar(25) primary key',) + ('varchar(15)',)
+
+            sql = '''create table j_label (
+                name            %s,
+                issue_key           %s,
+                constraint j_label_fk
+                foreign key (issue_key) references j_issue (issue_key)
                 )''' % params
 
         if sql != '':
