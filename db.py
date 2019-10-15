@@ -34,7 +34,7 @@ class Connection:
         return table_exists
 
     def __createCommonTables(self):
-        for table in ('account'):
+        for table in ('account',):
             if self.__checkTableExists(table) == False:
                 self.__createCommonTable(table)
 
@@ -89,6 +89,7 @@ class Connection:
             cursor = self.__conn.cursor()
             cursor.execute(sql, param)
             cursor.close()
+            self.__conn.commit()
 
     def _createConnection(self):
         if self.__db == 'sqlite':
@@ -326,6 +327,35 @@ class Connection:
                     comment['comment'],
                     comment['commentAction'],
                     datetime.datetime.fromtimestamp(comment['createdDate'] / 1e3))
+
+            try:
+                self.__executeSql(sql, param)
+            except mysql.connector.Error as err:
+                print(sql, param)
+
+    def addIssues(self, issues):
+        vars = self.__generateDbSpecificVar(14)
+
+        sql = '''replace into j_issue
+                (issue_key, priority, status, assignee, creator, reporter, type, project, project_name, created_date, updated_date, resolved_date, description, summary)
+                values
+                ({vars})'''.format(vars=vars)
+
+        for issue in issues:
+            param = (issue['issue_key'], 
+                     issue['priority'],
+                     issue['status'],
+                     issue['assignee'],
+                     issue['creator'],
+                     issue['reporter'],
+                     issue['type'],
+                     issue['project'],
+                     issue['project_name'],
+                     datetime.datetime.strptime(issue['created_date'][:23], '%Y-%m-%dT%H:%M:%S.%f'),
+                     datetime.datetime.strptime(issue['updated_date'][:23], '%Y-%m-%dT%H:%M:%S.%f'),
+                     None if issue['resolved_date'] is None else datetime.datetime.strptime(issue['resolved_date'][:23], '%Y-%m-%dT%H:%M:%S.%f'),
+                     issue['description'],
+                     issue['summary'])
 
             try:
                 self.__executeSql(sql, param)
