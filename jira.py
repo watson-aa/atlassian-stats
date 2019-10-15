@@ -5,10 +5,6 @@ import datetime
 class Jira:
     __config = None
 
-    # statics
-    _page_size = 100
-    _loop_limit = 25
-
     def __init__(self):
         pass
 
@@ -23,15 +19,21 @@ class Jira:
         earliest_date = datetime.datetime.now()
 
         conn = db.Connection(self.__config['database'])
- 
-        url = 'https://' + self.__config['server']['Domain'] + self.__config['server']['ApiPath'] + '?jql=status%20%3D%20Done%20AND%20project%20%3D%20' + project
-        auth = (self.__config['server']['User'], self.__config['server']['Password'])
-        data = common.makeApiRequest(url, auth, False)
 
-        (issues, accounts) = self.__extractIssueData(project, project_name, data)
+        start = 0
+        total = 50
+        while start <= total: 
+            url = 'https://' + self.__config['server']['Domain'] + self.__config['server']['ApiPath'] + '?jql=status%20%3D%20Done%20AND%20project%20%3D%20' + project + '&startAt=' + str(start)
+            auth = (self.__config['server']['User'], self.__config['server']['Password'])
+            data = common.makeApiRequest(url, auth, False)
 
-        conn.addUsers(accounts)
-        conn.addIssues(issues)
+            total = data['total']
+            start += data['maxResults']
+
+            (issues, accounts) = self.__extractIssueData(project, project_name, data)
+
+            conn.addUsers(accounts)
+            conn.addIssues(issues)
         conn.closeConnection()
 
     def __addAccount(self, account, accounts):
@@ -68,7 +70,7 @@ class Jira:
                 'created_date': issue['fields']['created'],
                 'updated_date': issue['fields']['updated'],
                 'resolved_date': issue['fields']['resolutiondate'],
-                'description': issue['fields']['description'],
+                'description': None,
                 'summary': issue['fields']['summary']
             })
         return (issues, accounts)
