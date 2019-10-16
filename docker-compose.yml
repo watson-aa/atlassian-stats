@@ -23,3 +23,18 @@ services:
             - ./data/db:/var/lib/mysql
         networks:
             - atstats
+    querytree:
+        image: d4software/querytree:latest
+        container_name: querytree
+        restart: always
+        ports:
+            - "8888:80"
+        environment:
+            Customization__SystemName: 'Atlassian Statistics'
+            Customization__AllowAdvancedQuery: 'true'
+            ConnectionStrings__DefaultConnection: 'Filename=/data/querytree.db;'
+        volumes:
+            - ./data/querytree:/data
+        networks:
+            - atstats
+        
