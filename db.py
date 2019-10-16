@@ -108,11 +108,12 @@ class Connection:
                 params = ('varchar(15) primary key',)
 
             sql = '''create table account (
-                slug    %s,
-                name    text,
-                email   text,
-                display text,
-                type    text
+                slug        %s,
+                name        text,
+                email       text,
+                display     text,
+                type        text,
+                location    text
                 )''' % params
 
         if sql != '':
