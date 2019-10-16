@@ -311,7 +311,8 @@ class Connection:
             try:
                 self.__executeSql(sql, param)
             except mysql.connector.Error as err:
-                print(sql, param)
+                print('ERROR (addReviewers):', sql, param)
+                print(err)
 
     def addComments(self, comments):
         vars = self.__generateDbSpecificVar(5)
@@ -331,7 +332,8 @@ class Connection:
             try:
                 self.__executeSql(sql, param)
             except mysql.connector.Error as err:
-                print(sql, param)
+                print('ERROR (addComments):', sql, param)
+                print(err)
 
     def addIssues(self, issues):
         vars = self.__generateDbSpecificVar(14)
@@ -360,7 +362,8 @@ class Connection:
             try:
                 self.__executeSql(sql, param)
             except mysql.connector.Error as err:
-                print(sql, param)
+                print('ERROR (addIssues):', sql, param)
+                print(err)
 
     def closeConnection(self):
         self.__conn.close()
