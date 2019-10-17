@@ -11,7 +11,8 @@ class Jira:
     def loadConfig(self, config_file):
         self.__config = common.loadConfig(config_file)
 
-    def loadData(self, start_date):
+    # TODO: implement end_date
+    def loadData(self, start_date, end_date):
         for project in self.__config['projects']:
             self._getDataFromApi(project, self.__config['projects'][project], start_date) 
 
@@ -31,6 +32,14 @@ class Jira:
             start += data['maxResults']
 
             (issues, accounts) = self.__extractIssueData(project, project_name, data)
+
+            update_date = None
+            try:
+                update_date = datetime.datetime.strptime(issues[-1:][0]['updated_date'][:23], '%Y-%m-%dT%H:%M:%S.%f')
+            except:
+                update_date = datetime.datetime.now()
+            if update_date < start_date:
+                break
 
             conn.addUsers(accounts)
             conn.addIssues(issues)
