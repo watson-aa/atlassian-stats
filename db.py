@@ -161,6 +161,21 @@ class Connection:
                 constraint j_label_fk
                 foreign key (issue_key) references j_issue (issue_key)
                 )''' % params
+        elif table == 'j_changelog':
+            if self.__db == 'sqlite':
+                params = ('text',) + ('text',) + ('integer',)
+            elif self.__db == 'mysql':
+                params = ('varchar(25)',) + ('varchar(15)',) + ('datetime',)
+
+            sql = '''create table j_changelog (
+                issue_key   %s,
+                author      %s,
+                timestamp   %s,
+                field       text,
+                value       text,
+                constraint j_changelog_fk
+                foreign key (issue_key) references j_issue (issue_key)
+                )''' % params
 
         if sql != '':
             self.__executeSql(sql, None)
@@ -336,6 +351,15 @@ class Connection:
                 print('ERROR (addComments):', sql, param)
                 print(err)
 
+    def removeChangeLog(self, issue):
+        sql = '''delete from j_changelog where issue_key = {vars}'''.format(vars=self.__generateDbSpecificVar(1))
+        self.__executeSql(sql, (issue, ))
+        try:
+            self.__executeSql(sql, (issue, ))
+        except mysql.connector.Error as err:
+            print('ERROR (removeChangeLog):', sql, issue)
+            print(err)
+
     def addIssues(self, issues):
         vars = self.__generateDbSpecificVar(14)
 
@@ -345,6 +369,8 @@ class Connection:
                 ({vars})'''.format(vars=vars)
 
         for issue in issues:
+            self.removeChangeLog(issue['issue_key'])
+
             param = (issue['issue_key'], 
                      issue['priority'],
                      issue['status'],
@@ -364,6 +390,27 @@ class Connection:
                 self.__executeSql(sql, param)
             except mysql.connector.Error as err:
                 print('ERROR (addIssues):', sql, param)
+                print(err)
+
+    def addChangelog(self, changelog):
+        vars = self.__generateDbSpecificVar(5)
+
+        sql = '''replace into j_changelog
+                (issue_key, author, field, value, timestamp)
+                values
+                ({vars})'''.format(vars=vars)
+
+        for event in changelog:
+            param = (event['issue_key'], 
+                     event['author'],
+                     event['field'],
+                     event['value'],
+                     datetime.datetime.strptime(event['timestamp'][:23], '%Y-%m-%dT%H:%M:%S.%f'))
+
+            try:
+                self.__executeSql(sql, param)
+            except mysql.connector.Error as err:
+                print('ERROR (addChangelog):', sql, param)
                 print(err)
 
     def closeConnection(self):
