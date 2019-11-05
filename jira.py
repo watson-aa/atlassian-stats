@@ -24,7 +24,7 @@ class Jira:
         start = 0
         total = 50
         while start <= total: 
-            url = 'https://' + self.__config['server']['Domain'] + self.__config['server']['ApiPath'] + '?jql=status%20%3D%20Done%20AND%20project%20%3D%20' + project + '&startAt=' + str(start)
+            url = 'https://' + self.__config['server']['Domain'] + self.__config['server']['ApiPath'] + '?jql=status%20%3D%20' + self.__config['server']['Status'] + '%20AND%20project%20%3D%20' + project + '&startAt=' + str(start)
             auth = (self.__config['server']['User'], self.__config['server']['Password'])
             data = common.makeApiRequest(url, auth, False)
 
@@ -32,6 +32,8 @@ class Jira:
             start += data['maxResults']
 
             (issues, accounts) = self.__extractIssueData(project, project_name, data)
+            print(len(issues))
+            print(url)
 
             update_date = None
             try:
