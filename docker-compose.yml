@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  atstats:
+  net:
 
 services:
     mysql:
@@ -22,7 +22,7 @@ services:
             - ./data/dump:/docker-entrypoint-initdb.d
             - ./data/db:/var/lib/mysql
         networks:
-            - atstats
+            - net
     querytree:
         image: d4software/querytree:latest
         container_name: querytree
@@ -37,5 +37,5 @@ services:
         volumes:
             - ./data/querytree:/data
         networks:
-            - atstats
+            - net
         
