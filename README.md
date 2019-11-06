@@ -7,7 +7,7 @@ First of all, you need to [install Docker](https://www.docker.com/products/docke
 
 ### Database and QueryTree:
 Open a terminal, navigate to the project directory and run `docker-compose up -d`.  This will download the latest MySql and QueryTree images (based on `docker-compose.yml`) and run them as a daemon.
-The database is accessible on IP 127.0.0.1 and port 3306.  Check `docker-compose.yml` for credentials.
+The database is accessible on IP 127.0.0.1 and port 3306.  Check `docker-compose.yml` for credentials.  To shutdown the project, run `docker-compose down`.
 
 QueryTree is accessible at http://localhost:8888/ .  Credentials are `mr_admin@mailinator.com` / `N0tVerySecure!` .
 
