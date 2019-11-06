@@ -16,10 +16,11 @@ class Bitbucket:
 
     def loadConfig(self, config_file):
         self.__config = common.loadConfig(config_file)
-
-    def loadData(self, start_date):
+        
+    # TODO: implement end_date
+    def loadData(self, start_date, end_date):
         for project in self.__config['projects']:
-            self._getDataFromApi(project, self.__config['projects'][project], start_date)
+            self._getDataFromApi(project, self.__config['projects'][project], start_date, end_date)
 
     def __extractActData(self, activity_id, data):
         reviewers = []
@@ -42,7 +43,7 @@ class Bitbucket:
                 })
         return (reviewers, comments)
 
-    def _getDataFromApi(self, project_name, project, start_date):
+    def _getDataFromApi(self, project_name, project, start_date, end_date):
         earliest_date = datetime.datetime.now()
         counter = 0
 
