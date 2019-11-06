@@ -33,6 +33,7 @@ services:
             Customization__SystemName: 'Atlassian Statistics'
             Customization__AllowAdvancedQuery: 'true'
             ConnectionStrings__DefaultConnection: 'Filename=/data/querytree.db;'
+            Passwords__Keyfile: '/data/querytree.key'
         volumes:
             - ./data/querytree:/data
         networks:
