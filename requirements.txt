@@ -1,0 +1,4 @@
+configparser==4.0.2
+mysql-connector==2.2.9
+mysqlclient==1.4.4
+requests==2.22.0
