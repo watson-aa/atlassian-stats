@@ -1,6 +1,6 @@
 # Atlassian Statistics (a.k.a. "atstats")
 ### Purpose:
-Pull useful information from the Atlassian APIs and store the results in a MySQL database for easy querying.  Bonus points for using QueryTree to visualize.
+Pull useful information from the Atlassian APIs and store the results in a [MySQL](https://www.mysql.com/) database for easy querying.  Bonus points for using [QueryTree](https://querytreeapp.com/) to visualize.
 
 ### Running:
 First of all, you need to [install Docker](https://www.docker.com/products/docker-desktop).  The database and QueryTree visualization tool use docker-compose.  The scraper script runs inside of it's own Docker container.
