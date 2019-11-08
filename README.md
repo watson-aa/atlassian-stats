@@ -16,6 +16,7 @@ QueryTree is accessible at http://localhost:8888/ .  Credentials are `mr_admin@m
 ### The Scraper Script:
 You need to build the container the first time or whenever you update the config file:
 - `docker build -t atstats_script .`
+
 Run the script to pull data from the APIs and to insert it into the database:
 - `docker run --network=atlassian-stats_net atstats_script`
 
